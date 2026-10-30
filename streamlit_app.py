@@ -1,13 +1,18 @@
 import streamlit as st
 import google.generativeai as genai
 
-# Check if the ESP32 is sending a direct query via URL parameter (e.g., ?prompt=hello)
+# Fetch API key securely from Streamlit Cloud Secrets
+try:
+    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+except Exception:
+    GEMINI_API_KEY = ""
+
+# Check if the ESP32 is sending a direct query via URL parameter
 query_params = st.query_params
 if "prompt" in query_params:
     user_query = query_params["prompt"]
-    api_key = query_params.get("key", "AQ.Ab8RN6KQiH7njq2u-Q4A_afXGdqOzZ8GENIPwg63r6ymHjYZZg")
     try:
-        genai.configure(api_key=api_key)
+        genai.configure(api_key=GEMINI_API_KEY)
         system_instruction = (
             "You are a 0.96-inch OLED micro-display layout text format engine. "
             "You must structure the raw answer directly into short lines of maximum 15 characters each. "
@@ -16,11 +21,10 @@ if "prompt" in query_params:
         )
         model = genai.GenerativeModel(model_name="gemini-1.5-flash", system_instruction=system_instruction)
         response = model.generate_content(user_query)
-        # Output clean plain text for the ESP32 to read easily
         st.text(response.text)
     except Exception as e:
         st.text(f"Error: {e}")
-    st.stop()  # Stop rendering the heavy UI when the ESP32 is just fetching data
+    st.stop()
 
 # --- Standard Visual UI for Your Browser ---
 st.set_page_config(page_title="Project AeroNode AI", page_icon="🖥️", layout="centered")
@@ -37,19 +41,14 @@ st.markdown("""
 st.title("🖥️ Project AeroNode AI Hub")
 st.caption("Cloud AI Engine optimized for your 0.96-inch OLED micro-display.")
 
-with st.sidebar:
-    st.header("⚙️ Settings")
-    api_key_input = st.text_input("Gemini API Key", type="password", value="AQ.Ab8RN6KQiH7njq2u-Q4A_afXGdqOzZ8GENIPwg63r6ymHjYZZg")
-    st.info("Formatted specifically for 15 characters per line and max 6 lines.")
+if not GEMINI_API_KEY:
+    st.error("API Key not found! Please add GEMINI_API_KEY in your Streamlit App Settings -> Secrets menu.")
+else:
+    user_prompt = st.text_input("Enter your prompt for the ESP32 terminal:", "Give a system status update for AeroNode.")
 
-user_prompt = st.text_input("Enter your prompt for the ESP32 terminal:", "Give a system status update for AeroNode.")
-
-if st.button("🚀 Generate Formatted OLED Output"):
-    if not api_key_input:
-        st.error("Please enter your Gemini API Key.")
-    else:
+    if st.button("🚀 Generate Formatted OLED Output"):
         try:
-            genai.configure(api_key=api_key_input)
+            genai.configure(api_key=GEMINI_API_KEY)
             system_instruction = (
                 "You are a 0.96-inch OLED micro-display layout text format engine. "
                 "You must structure the raw answer directly into short lines of maximum 15 characters each. "
