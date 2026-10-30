@@ -20,9 +20,9 @@ if "prompt" in query_params:
             "Do not use opening introductions, markdown asterisks, or structural headers."
         )
         
-        # Updated to use a universally supported current model endpoint
+        # Updated to use the active Gemini 3.8 Flash model endpoint
         model = genai.GenerativeModel(
-            model_name="gemini-2.5-flash", 
+            model_name="gemini-3.8-flash", 
             system_instruction=system_instruction
         )
         response = model.generate_content(user_query)
@@ -62,7 +62,7 @@ else:
             )
             
             model = genai.GenerativeModel(
-                model_name="gemini-2.5-flash", 
+                model_name="gemini-3.8-flash", 
                 system_instruction=system_instruction
             )
             
