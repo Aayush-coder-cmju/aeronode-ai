@@ -19,7 +19,12 @@ if "prompt" in query_params:
             "Break lines explicitly using '\\n'. Max 6 total lines output. Be concise. "
             "Do not use opening introductions, markdown asterisks, or structural headers."
         )
-        model = genai.GenerativeModel(model_name="gemini-1.5-flash", system_instruction=system_instruction)
+        
+        # Updated to use a universally supported current model endpoint
+        model = genai.GenerativeModel(
+            model_name="gemini-2.5-flash", 
+            system_instruction=system_instruction
+        )
         response = model.generate_content(user_query)
         st.text(response.text)
     except Exception as e:
@@ -55,7 +60,11 @@ else:
                 "Break lines explicitly using '\\n'. Max 6 total lines output. Be concise. "
                 "Do not use opening introductions, markdown asterisks, or structural headers."
             )
-            model = genai.GenerativeModel(model_name="gemini-1.5-flash", system_instruction=system_instruction)
+            
+            model = genai.GenerativeModel(
+                model_name="gemini-2.5-flash", 
+                system_instruction=system_instruction
+            )
             
             with st.spinner("Formatting response for your OLED screen..."):
                 response = model.generate_content(user_prompt)
